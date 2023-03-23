@@ -8,7 +8,7 @@
         </div>
 
         <div class="fixed bottom-0 left-0">
-            <form @submit="sendMessage">
+            <form @submit.prevent="sendMessage">
                 <textarea class="bg-black/30 rounded-md" v-model="input" cols="30" rows="2">
                 </textarea>
                 <button type="submit">Submit</button>
@@ -40,6 +40,8 @@ async function sendMessage() {
     }
 
     messages.value.push({role: "user", content: input.value});
+
+    input.value = "";
 
     const configuration = new Configuration({
         apiKey: key,
