@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
-    "vue": "^3.2.45"
+    "openai": "^3.2.1",
+    "tauri-plugin-store-api": "https://github.com/tauri-apps/tauri-plugin-store",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.2.2",
