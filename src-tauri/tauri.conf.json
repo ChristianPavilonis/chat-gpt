@@ -43,8 +43,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "chat-gpt",
-        "width": 800,
-        "height": 600,
+        "width": 1156,
+        "height": 1024,
         "transparent": true
       }
     ]

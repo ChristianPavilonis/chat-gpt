@@ -1,27 +1,34 @@
 <template>
     <div class="max-w-750 mx-auto pt-20">
         <div class="space-y-12">
-            <div class="flex bg-black/50 rounded-md" v-for="message in displayMessages">
-                <div class="uppercase mr-15">{{ message.role }}</div>
-                <div>{{ message.content }}</div>
+            <div
+                v-for="message in displayMessages"
+                class="flex rounded-md max-w-800 px-25 py-18"
+                :class="message.role === 'assistant' ? 'ml-auto bg-black/50': 'mr-auto bg-black/20'"
+            >
+                <Markdown class="prose prose-invert" :source="message.content"/>
             </div>
         </div>
 
-        <div class="fixed bottom-0 left-0">
-            <form @submit.prevent="sendMessage">
-                <textarea class="bg-black/30 rounded-md" v-model="input" cols="30" rows="2">
-                </textarea>
-                <button type="submit">Submit</button>
-            </form>
+        <div class="fixed bottom-10 max-w-800 w-full">
+            <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current"/>
+            <ChatBox
+                v-model="input"
+                @submit="sendMessage"
+            />
         </div>
     </div>
-
 </template>
 
 <script lang="ts" setup>
 import {computed, inject, onMounted, ref} from 'vue';
 import {Store} from "tauri-plugin-store-api";
 import {ChatCompletionRequestMessage, Configuration, OpenAIApi} from "openai";
+import ChatBox from "../components/ChatBox.vue";
+import Markdown from 'vue3-markdown-it';
+import 'highlight.js/styles/github-dark-dimmed.css';
+import AsyncIndicator from "../components/AsyncIndicator.vue";
+
 
 const store = inject<Store>("store") || new Store(".settings.dat");
 let key: string | null;
@@ -31,13 +38,15 @@ const messages = ref<Array<ChatCompletionRequestMessage>>([{
 }]);
 
 const input = ref("");
-
+const loading = ref(false);
 const displayMessages = computed(() => messages.value.filter((msg) => msg.role !== "system"))
 
 async function sendMessage() {
     if (key == null) {
         return;
     }
+
+    loading.value = true;
 
     messages.value.push({role: "user", content: input.value});
 
@@ -50,18 +59,24 @@ async function sendMessage() {
     const openai = new OpenAIApi(configuration);
 
 
-    const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: messages.value,
-    });
+    try {
+        const completion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: messages.value,
+        });
 
-    if (completion.data.choices.length > 0) {
-        const choice = completion.data.choices[0];
+        if (completion.data.choices.length > 0) {
+            const choice = completion.data.choices[0];
 
-        if (choice.message) {
-            messages.value.push(choice.message)
+            if (choice.message) {
+                messages.value.push(choice.message)
+            }
         }
+    } catch(error) {
+        console.error(error);
     }
+
+    loading.value = false;
 }
 
 
