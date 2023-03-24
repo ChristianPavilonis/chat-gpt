@@ -10,6 +10,10 @@
             </div>
         </div>
 
+        <div v-if="!key" class="h-600 w-full flex justify-center items-center">
+            <p class="text-2xl">Set your api key (⌘ + ,)</p>
+        </div>
+
         <div class="fixed bottom-10 max-w-800 w-full">
             <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current"/>
             <ChatBox
@@ -25,6 +29,7 @@ import {computed, inject, onMounted, ref} from 'vue';
 import {Store} from "tauri-plugin-store-api";
 import {ChatCompletionRequestMessage, Configuration, OpenAIApi} from "openai";
 import ChatBox from "../components/ChatBox.vue";
+// @ts-ignore
 import Markdown from 'vue3-markdown-it';
 import 'highlight.js/styles/github-dark-dimmed.css';
 import AsyncIndicator from "../components/AsyncIndicator.vue";

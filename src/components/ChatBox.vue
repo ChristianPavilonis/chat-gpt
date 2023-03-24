@@ -3,8 +3,9 @@
             <textarea
                 class="bg-transparent w-full resize-none transition-all overflow-y-hidden px-24 text-lg"
                 :value="modelValue"
-                @input="emit('update:modelValue', $event.target.value)"
+                @input="update"
                 @keyup="setTextareaHeight"
+                @keydown.enter="handleEnter"
                 :style="textareaStyle"
             ></textarea>
         <button type="submit" class="p-16">
@@ -30,12 +31,23 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'submit']);
 const textareaStyle = ref();
 
+function update(event: any) {
+    emit('update:modelValue', event.target.value);
+}
+
+
 function setTextareaHeight() {
     let numberOfLineBreaks = (props.modelValue.match(/\n/g) || []).length;
     let newHeight = 20 + numberOfLineBreaks * 20 + 40 + 2;
 
     textareaStyle.value = {
         height: newHeight + "px",
+    }
+}
+
+function handleEnter(event: any) {
+    if(!event.shiftKey) {
+        emit('submit');
     }
 }
 
