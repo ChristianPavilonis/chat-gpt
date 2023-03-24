@@ -33,13 +33,13 @@ import AsyncIndicator from "../components/AsyncIndicator.vue";
 const store = inject<Store>("store") || new Store(".settings.dat");
 let key: string | null;
 
-const messages = ref<Array<ChatCompletionRequestMessage>>([{
-    role: "system", content: "You are a helpful assistant",
-}]);
+const messages = ref<Array<ChatCompletionRequestMessage>>([]);
 
 const input = ref("");
 const loading = ref(false);
-const displayMessages = computed(() => messages.value.filter((msg) => msg.role !== "system"))
+const displayMessages = computed(() => {
+    return messages.value.filter((msg) => msg.role !== "system");
+})
 
 async function sendMessage() {
     if (key == null) {
@@ -72,6 +72,8 @@ async function sendMessage() {
                 messages.value.push(choice.message)
             }
         }
+
+        await store.set("conversation", messages.value);
     } catch(error) {
         console.error(error);
     }
@@ -80,8 +82,34 @@ async function sendMessage() {
 }
 
 
+function resetConversation() {
+    messages.value = [{
+        role: "system", content: "You are a helpful assistant",
+    }];
+    store.set("conversation", messages.value);
+}
+
+function registerClearShortcut() {
+    document.addEventListener("keydown", (event) => {
+        if(event.metaKey && event.key === "k") {
+            resetConversation();
+        }
+    });
+}
+
 onMounted(async () => {
     key = await store.get("openai-key");
+
+    const conversation: Array<ChatCompletionRequestMessage>|null = await store.get("conversation");
+
+    if(conversation) {
+         messages.value = conversation;
+    }
+    else {
+        resetConversation();
+    }
+
+    registerClearShortcut();
 })
 
 </script>

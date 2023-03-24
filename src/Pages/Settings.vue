@@ -1,14 +1,16 @@
 <template>
-    <div>
-        <RouterLink to="/">Back</RouterLink>
+    <div class="max-w-900 mx-auto">
+        <div class="mb-24">
+            <RouterLink to="/">Back</RouterLink>
+        </div>
 
 
-        <h1>Settings</h1>
+        <h1 class="mb-24 text-lg">Settings</h1>
 
         <div>
             <label>
-                <span class="block uppercase font-semibold">Open Ai key</span>
-                <input class="bg-black/30" type="password" v-model="openApiKey" @change="save">
+                <span class="block uppercase font-semibold mb-12">Open Ai key</span>
+                <input class="bg-black/30 rounded py-8 px-12" type="password" v-model="openApiKey" @change="save">
             </label>
         </div>
     </div>
