@@ -10,7 +10,7 @@ To clear your conversation press Command + K
 
 ## Building
 
-Setup Rust follow [this guide](https://tauri.app/v1/guides/getting-started/prerequisites) for your system.
+You need Rust to build this application. To setup Rust follow [this guide](https://tauri.app/v1/guides/getting-started/prerequisites) for your system.
 
 Install dependencies
 ```bash
