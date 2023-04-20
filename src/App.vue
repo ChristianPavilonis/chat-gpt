@@ -12,8 +12,6 @@ import {useRouter} from "vue-router";
 import {shortcut} from "./Lib/helpers";
 
 const router = useRouter();
-const store = inject<Store>("store");
-
 
 function navigateToSettings() {
     router.push("/settings");

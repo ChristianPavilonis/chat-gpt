@@ -1,3 +1,7 @@
+import {Configuration, OpenAIApi} from "openai";
+import {inject} from "vue";
+import {Store} from "tauri-plugin-store-api";
+
 type Handler = (event: Event) => void;
 
 interface Options {
@@ -40,4 +44,24 @@ export function shortcut(options: string | Options, callback?: Handler, modifier
             }
         }
     });
+}
+
+
+export async function createOpenAiClient() {
+    const store = useStore();
+    const key: string | null = await store.get("openai-key");
+
+    if(key == null) {
+        throw new Error("Key not set");
+    }
+
+    const configuration = new Configuration({
+        apiKey: key,
+    });
+
+    return new OpenAIApi(configuration);
+}
+
+export function useStore() {
+    return inject<Store>("store") || new Store(".settings.dat");
 }

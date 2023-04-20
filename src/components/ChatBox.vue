@@ -35,7 +35,6 @@ function update(event: any) {
     emit('update:modelValue', event.target.value);
 }
 
-
 function setTextareaHeight() {
     let numberOfLineBreaks = (props.modelValue.match(/\n/g) || []).length;
     let newHeight = 20 + numberOfLineBreaks * 20 + 40 + 2;
