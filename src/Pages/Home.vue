@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-750 mx-auto pt-20">
+    <div class="max-w-800 mx-auto pt-20">
         <div class="space-y-12">
             <div
                 v-for="message in displayMessages"
@@ -14,12 +14,14 @@
             <p class="text-2xl">Set your api key (⌘ + ,)</p>
         </div>
 
-        <div class="fixed bottom-10 max-w-800 w-full">
-            <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current"/>
-            <ChatBox
-                v-model="input"
-                @submit="sendMessage"
-            />
+        <div class="fixed bottom-10 container w-full">
+            <div class="max-w-800">
+                <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current"/>
+                <ChatBox
+                    v-model="input"
+                    @submit="sendMessage"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -33,6 +35,7 @@ import ChatBox from "../components/ChatBox.vue";
 import Markdown from 'vue3-markdown-it';
 import 'highlight.js/styles/github-dark-dimmed.css';
 import AsyncIndicator from "../components/AsyncIndicator.vue";
+import {shortcut} from "../Lib/helpers";
 
 
 const store = inject<Store>("store") || new Store(".settings.dat");
@@ -79,7 +82,7 @@ async function sendMessage() {
         }
 
         await store.set("conversation", messages.value);
-    } catch(error) {
+    } catch (error) {
         console.error(error);
     }
 
@@ -94,27 +97,25 @@ function resetConversation() {
     store.set("conversation", messages.value);
 }
 
-function registerClearShortcut() {
-    document.addEventListener("keydown", (event) => {
-        if(event.metaKey && event.key === "k") {
-            resetConversation();
-        }
-    });
-}
 
 onMounted(async () => {
     key = await store.get("openai-key");
 
-    const conversation: Array<ChatCompletionRequestMessage>|null = await store.get("conversation");
+    const conversation: Array<ChatCompletionRequestMessage> | null = await store.get("conversation");
 
-    if(conversation) {
-         messages.value = conversation;
-    }
-    else {
+    if (conversation) {
+        messages.value = conversation;
+    } else {
         resetConversation();
     }
 
-    registerClearShortcut();
+    shortcut({
+        key: "k",
+        modifier: true,
+        handler: (event) => {
+            resetConversation();
+        },
+    });
 })
 
 </script>

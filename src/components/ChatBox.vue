@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="emit('submit')" class="bg-black/30 w-full flex">
+    <form @submit.prevent="submit" class="bg-black/30 w-full flex">
             <textarea
                 class="bg-transparent w-full resize-none transition-all overflow-y-hidden px-24 text-lg"
                 :value="modelValue"
@@ -46,7 +46,13 @@ function setTextareaHeight() {
 }
 
 function handleEnter(event: any) {
-    if(!event.shiftKey) {
+    if (!event.shiftKey) {
+        submit();
+    }
+}
+
+function submit() {
+    if (props.modelValue?.trim() !== "") {
         emit('submit');
     }
 }
