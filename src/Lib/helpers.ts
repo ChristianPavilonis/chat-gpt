@@ -1,4 +1,4 @@
-import {Configuration, OpenAIApi} from "openai";
+import {ChatCompletionRequestMessage, Configuration, OpenAIApi} from "openai";
 import {inject} from "vue";
 import {Store} from "tauri-plugin-store-api";
 
@@ -37,8 +37,7 @@ export function shortcut(options: string | Options, callback?: Handler, modifier
             if (modifierPressed && event.key === key) {
                 handler(event);
             }
-        }
-        else {
+        } else {
             if (event.key === key) {
                 handler(event);
             }
@@ -51,7 +50,7 @@ export async function createOpenAiClient() {
     const store = useStore();
     const key: string | null = await store.get("openai-key");
 
-    if(key == null) {
+    if (key == null) {
         throw new Error("Key not set");
     }
 
@@ -64,4 +63,20 @@ export async function createOpenAiClient() {
 
 export function useStore() {
     return inject<Store>("store") || new Store(".settings.dat");
+}
+
+export async function sendChatMessage(
+    openai: OpenAIApi,
+    messages: ChatCompletionRequestMessage[]
+): Promise<ChatCompletionRequestMessage> {
+    const store = useStore();
+    const model = await store.get("ai-model") || "gpt-3.5-turbo";
+
+    const completion = await openai.createChatCompletion({model, messages});
+
+    if (completion.data.choices.length > 0) {
+        const choice = completion.data.choices[0];
+
+        return choice.message;
+    }
 }
