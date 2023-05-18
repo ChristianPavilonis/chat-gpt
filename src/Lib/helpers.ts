@@ -70,9 +70,9 @@ export function useStore() {
 export async function sendChatMessage(
     openai: OpenAIApi,
     messages: ChatCompletionRequestMessage[]
-): Promise<ChatCompletionRequestMessage> {
+): Promise<ChatCompletionRequestMessage | undefined> {
     const store = useStore();
-    const model = await store.get("ai-model") || "gpt-3.5-turbo";
+    const model: string = await store.get("ai-model") || "gpt-3.5-turbo";
 
     const completion = await openai.createChatCompletion({model, messages});
 

@@ -1,8 +1,13 @@
 import {defineStore} from "pinia";
 
 
+interface ConversationsStore {
+    activeConversation: any;
+    conversations: any[];
+}
+
 export const useConversationsStore = defineStore('ConversationsStore', {
-    state: () => ({
+    state: (): ConversationsStore => ({
         activeConversation: {},
         conversations: [],
     }),

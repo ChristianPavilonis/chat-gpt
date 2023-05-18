@@ -61,8 +61,6 @@ const displayMessages = computed(() => {
     return conversation.value.messages.filter((msg: any) => msg.role !== "system");
 })
 
-
-
 async function sendMessage() {
     if (openai.value === undefined) {
         return;
@@ -104,7 +102,7 @@ async function generateTitle() {
         role: "user",
         content: "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations."
     }]);
-    conversation.value.title = response.content;
+    conversation.value.title = response?.content || "";
 
     await saveConversation();
 }
