@@ -33,9 +33,8 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, inject, nextTick, onMounted, ref} from 'vue';
-import {Store} from "tauri-plugin-store-api";
-import {ChatCompletionRequestMessage, Configuration, OpenAIApi} from "openai";
+import {computed, nextTick, onMounted, ref} from 'vue';
+import {OpenAIApi} from "openai";
 import ChatBox from "../components/ChatBox.vue";
 // @ts-ignore
 import Markdown from 'vue3-markdown-it';
@@ -43,13 +42,15 @@ import 'highlight.js/styles/github-dark-dimmed.css';
 import AsyncIndicator from "../components/AsyncIndicator.vue";
 import {createOpenAiClient, sendChatMessage, shortcut, useStore} from "../Lib/helpers";
 import {invoke} from "@tauri-apps/api";
-import {v4 as uuidV4} from "uuid";
 import {useRoute} from "vue-router";
+import {useConversationsStore} from "../Lib/ConversationsStore.";
 
+const conversationStore = useConversationsStore();
 const store = useStore();
 const conversation = ref<any>({
     id: "",
     messages: [],
+    title: null,
 });
 const input = ref("");
 const loading = ref(false);
@@ -59,6 +60,8 @@ const openai = ref<OpenAIApi>();
 const displayMessages = computed(() => {
     return conversation.value.messages.filter((msg: any) => msg.role !== "system");
 })
+
+
 
 async function sendMessage() {
     if (openai.value === undefined) {
@@ -74,6 +77,10 @@ async function sendMessage() {
         const response = await sendChatMessage(openai.value, conversation.value.messages);
 
         await pushMessage(response)
+
+        if (conversation.value.title == null) {
+            generateTitle();
+        }
     } catch (error) {
         console.error(error);
     }
@@ -86,7 +93,20 @@ async function pushMessage(message: any) {
 
     await scrollToBottom();
     await saveConversation();
+}
 
+async function generateTitle() {
+    if(!openai.value) {
+        return;
+    }
+
+    const response = await sendChatMessage(openai.value, [...conversation.value.messages, {
+        role: "user",
+        content: "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations."
+    }]);
+    conversation.value.title = response.content;
+
+    await saveConversation();
 }
 
 async function saveConversation() {
@@ -95,13 +115,16 @@ async function saveConversation() {
     await invoke("save_conversation", {
         conversation: data,
     });
-}
 
+    conversationStore.updateConversation(data);
+}
 
 function resetConversation() {
     conversation.value.messages = [{
         role: "system", content: "You are a helpful assistant",
     }];
+    conversation.value.title = null;
+
     saveConversation();
 }
 

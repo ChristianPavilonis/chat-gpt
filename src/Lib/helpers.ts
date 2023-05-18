@@ -1,6 +1,8 @@
 import {ChatCompletionRequestMessage, Configuration, OpenAIApi} from "openai";
 import {inject} from "vue";
 import {Store} from "tauri-plugin-store-api";
+import {Router, useRouter} from "vue-router";
+import {v4 as uuidV4} from "uuid";
 
 type Handler = (event: Event) => void;
 
@@ -79,4 +81,11 @@ export async function sendChatMessage(
 
         return choice.message;
     }
+}
+
+
+export async function createConversation(router: Router) {
+    const id = uuidV4();
+
+    router.push(`conversation/${id}`);
 }

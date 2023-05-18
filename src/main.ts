@@ -6,6 +6,7 @@ import {createRouter, createWebHashHistory} from "vue-router";
 import Home from "./Pages/Home.vue";
 import Settings from "./Pages/Settings.vue";
 import Conversation from "./Pages/Conversation.vue";
+import {createPinia} from "pinia";
 
 const store = new Store(".settings.dat");
 
@@ -18,5 +19,10 @@ const router = createRouter({
     ]
 });
 
+const pinia = createPinia();
 
-createApp(App).use(router).provide("store", store).mount("#app");
+createApp(App)
+    .use(router)
+    .use(pinia)
+    .provide("store", store)
+    .mount("#app");

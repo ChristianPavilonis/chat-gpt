@@ -1,6 +1,9 @@
 <template>
-    <div class="container mx-auto text-white pb-100">
-        <RouterView/>
+    <div class="text-white flex">
+        <Sidebar/>
+        <div class="container mx-auto overflow-y-auto">
+            <RouterView/>
+        </div>
     </div>
 </template>
 
@@ -10,6 +13,7 @@ import {inject, onMounted} from "vue";
 import {Store} from "tauri-plugin-store-api";
 import {useRouter} from "vue-router";
 import {shortcut} from "./Lib/helpers";
+import Sidebar from "./components/Sidebar.vue";
 
 const router = useRouter();
 
@@ -29,7 +33,5 @@ onMounted(() => {
 
 </script>
 
-
 <style>
-
 </style>
