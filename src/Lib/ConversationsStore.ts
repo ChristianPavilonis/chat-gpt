@@ -20,6 +20,10 @@ export const useConversationsStore = defineStore('ConversationsStore', {
             this.conversations = conversations;
         },
 
+        pushConversation(conversation: any) {
+            this.conversations.push(conversation);
+        },
+
         updateConversation(newConversation: any) {
             let index = this.conversations.findIndex(
                 (conversation) => conversation.id === newConversation.id

@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-800 mx-auto pt-20">
+    <div class="max-w-800 mx-auto pt-20 pb-80">
         <div class="space-y-12">
             <div
                 v-for="message in displayMessages"
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, ref} from 'vue';
+import {computed, nextTick, onMounted, ref, watch} from 'vue';
 import {OpenAIApi} from "openai";
 import ChatBox from "../components/ChatBox.vue";
 // @ts-ignore
@@ -43,7 +43,7 @@ import AsyncIndicator from "../components/AsyncIndicator.vue";
 import {createOpenAiClient, sendChatMessage, shortcut, useStore} from "../Lib/helpers";
 import {invoke} from "@tauri-apps/api";
 import {useRoute} from "vue-router";
-import {useConversationsStore} from "../Lib/ConversationsStore.";
+import {useConversationsStore} from "../Lib/ConversationsStore";
 
 const conversationStore = useConversationsStore();
 const store = useStore();
@@ -60,6 +60,8 @@ const openai = ref<OpenAIApi>();
 const displayMessages = computed(() => {
     return conversation.value.messages.filter((msg: any) => msg.role !== "system");
 })
+
+watch(() => route.params.id, () => initConversation());
 
 async function sendMessage() {
     if (openai.value === undefined) {
@@ -94,7 +96,7 @@ async function pushMessage(message: any) {
 }
 
 async function generateTitle() {
-    if(!openai.value) {
+    if (!openai.value) {
         return;
     }
 
@@ -131,6 +133,17 @@ async function scrollToBottom() {
     window.scrollTo(0, document.body.scrollHeight);
 }
 
+async function initConversation() {
+    try {
+        conversation.value = await invoke('get_conversation', {
+            conversationId: route.params.id as string,
+        });
+    } catch (error) {
+        conversation.value.id = route.params.id;
+        resetConversation();
+    }
+}
+
 onMounted(async () => {
     try {
         openai.value = await createOpenAiClient();
@@ -138,13 +151,7 @@ onMounted(async () => {
         console.error(e);
     }
 
-    try {
-        conversation.value = await invoke('get_conversation', {
-            conversationId: route.params.id as string,
-        });
-    } catch (error) {
-        conversation.value.id = route.params.id;
-    }
+    await initConversation();
 
     shortcut({
         key: "k",

@@ -3,6 +3,7 @@ import {inject} from "vue";
 import {Store} from "tauri-plugin-store-api";
 import {Router, useRouter} from "vue-router";
 import {v4 as uuidV4} from "uuid";
+import {useConversationsStore} from "./ConversationsStore";
 
 type Handler = (event: Event) => void;
 
@@ -86,6 +87,8 @@ export async function sendChatMessage(
 
 export async function createConversation(router: Router) {
     const id = uuidV4();
+    let store = useConversationsStore();
 
-    router.push(`conversation/${id}`);
+    await router.push(`/conversation/${id}`);
+    store.pushConversation({id})
 }
