@@ -6,6 +6,7 @@
                     v-for="conversation in conversationsStore.conversations"
                     :to="`/conversation/${conversation.id}`"
                     class="px-20 py-16 flex hover:bg-black/30"
+                    :class="isCurrentConversation(conversation.id) ? 'bg-black/30' : ''"
                 >
                     <svg
                         class="w-24 h-24 mr-12"
@@ -49,12 +50,16 @@ import {useConversationsStore} from "../Lib/ConversationsStore";
 import {invoke} from "@tauri-apps/api";
 import {storeToRefs} from "pinia";
 import {createConversation} from "../Lib/helpers";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 let conversationsStore = useConversationsStore();
 let {conversations} = storeToRefs(conversationsStore);
 let router = useRouter();
+let route = useRoute();
 
+function isCurrentConversation(id: string) {
+    return route.params.id === id;
+}
 
 onMounted(async () => {
     let conversations = await invoke("get_conversations");
