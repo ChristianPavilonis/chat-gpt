@@ -1,4 +1,5 @@
 import {defineStore} from "pinia";
+import {invoke} from "@tauri-apps/api";
 
 
 interface ConversationsStore {
@@ -30,6 +31,12 @@ export const useConversationsStore = defineStore('ConversationsStore', {
             );
 
             this.conversations[index] = newConversation;
+        },
+
+        async loadConversations() {
+            let conversations = await invoke("get_conversations");
+
+            this.setConversations(conversations);
         }
 
     },

@@ -6,8 +6,9 @@ pub mod conversation;
 use tauri::Manager;
 use window_vibrancy::{apply_blur, apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
-
-use crate::conversation::{save_conversation, get_conversation, get_conversations};
+use crate::conversation::{
+    delete_conversation, get_conversation, get_conversations, save_conversation,
+};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -15,10 +16,15 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, save_conversation, get_conversation, get_conversations])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            save_conversation,
+            get_conversation,
+            get_conversations,
+            delete_conversation
+        ])
         .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let window = app.get_window("main").unwrap();

@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fs::File;
 use std::fs;
-use std::io::{Write, Read};
+use std::fs::File;
+use std::io::{Read, Write};
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -29,7 +29,6 @@ fn conversation_path(app: tauri::AppHandle, conversation_id: &String) -> Option<
     Some(format!("{path}/{}", conversation_id))
 }
 
-
 #[tauri::command]
 pub fn save_conversation(app: tauri::AppHandle, conversation: Conversation) -> Result<(), String> {
     let path = match conversation_path(app, &conversation.id) {
@@ -49,11 +48,27 @@ pub fn save_conversation(app: tauri::AppHandle, conversation: Conversation) -> R
     Ok(())
 }
 
+#[tauri::command]
+pub fn delete_conversation(app: tauri::AppHandle, conversation_id: String) -> Result<(), String> {
+    let path = match conversation_path(app, &conversation_id) {
+        Some(path) => path,
+        None => {
+            return Err(format!(
+                "Could not resolve path for conversation {}",
+                conversation_id
+            ))
+        }
+    };
+
+    std::fs::remove_file(path).map_err(|_| "Could not delete file".to_string())?;
+
+    Ok(())
+}
+
 pub fn load_conversation<P: AsRef<Path>>(path: P) -> Result<Conversation, String> {
     let mut json = String::new();
     let mut file = File::open(path).map_err(|e| e.to_string())?;
     file.read_to_string(&mut json).map_err(|e| e.to_string())?;
-
 
     let conversation = serde_json::from_str(&json).map_err(|e| format!("serde: {}", e))?;
 
@@ -80,10 +95,8 @@ pub fn get_conversation(
     Ok(conversation)
 }
 
-
 #[tauri::command]
 pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, String> {
-
     let path = match conversation_path(app, &"".to_string()) {
         Some(path) => path,
         None => {
@@ -91,30 +104,32 @@ pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, Str
         }
     };
 
-
     let dir = fs::read_dir(path).map_err(|e| format!("{e}"))?;
 
-    let conversations = dir.into_iter().flatten().flat_map(|file| {
-        let file_path = file.path();
+    let conversations = dir
+        .into_iter()
+        .flatten()
+        .flat_map(|file| {
+            let file_path = file.path();
 
-        let should_skip = match file_path.to_str() {
-            Some(p) => p.contains(".settings"),
-            None => false,
-        };
+            let should_skip = match file_path.to_str() {
+                Some(p) => p.contains(".settings"),
+                None => false,
+            };
 
-        if should_skip {
-            return None;
-        }
-
-        match load_conversation(file_path) {
-            Ok(convo) => Some(convo),
-            Err(e) => {
-                println!("{:?}", e);
-                None
+            if should_skip {
+                return None;
             }
-        }
-    }).collect();
 
+            match load_conversation(file_path) {
+                Ok(convo) => Some(convo),
+                Err(e) => {
+                    println!("{:?}", e);
+                    None
+                }
+            }
+        })
+        .collect();
 
     Ok(conversations)
 }
