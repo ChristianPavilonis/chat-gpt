@@ -1,6 +1,11 @@
 <template>
-    <div>
-        <button @click="createConversation(router)">new conversation</button>
+    <div class="flex justify-center items-center h-[100vh]">
+        <button
+            class="px-12 py-8 bg-black/40 rounded uppercase"
+            @click="createConversation(router)"
+        >
+            new chat +
+        </button>
     </div>
 </template>
 
