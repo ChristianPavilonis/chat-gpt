@@ -12,7 +12,7 @@
 import {inject, onMounted} from "vue";
 import {Store} from "tauri-plugin-store-api";
 import {useRouter} from "vue-router";
-import {shortcut} from "./Lib/helpers";
+import {createConversation, shortcut} from "./Lib/helpers";
 import Sidebar from "./components/Sidebar.vue";
 
 const router = useRouter();
@@ -29,6 +29,14 @@ onMounted(() => {
             navigateToSettings();
         },
     });
+
+    shortcut({
+        key: "n",
+        modifier: true,
+        handler(event) : void {
+            createConversation(router)
+        }
+    })
 });
 
 </script>
