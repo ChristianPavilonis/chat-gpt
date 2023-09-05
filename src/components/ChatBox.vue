@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submit" class="bg-black/30 w-full flex">
+    <form @submit.prevent="submit" class="bg-shade-6 w-full flex">
             <textarea
                 class="bg-transparent w-full resize-none transition-all overflow-y-hidden px-24 text-lg"
                 :value="modelValue"

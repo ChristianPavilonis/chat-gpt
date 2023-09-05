@@ -92,3 +92,16 @@ export async function createConversation(router: Router) {
     await router.push(`/conversation/${id}`);
     store.pushConversation({id})
 }
+
+export async function setTheme() {
+    const store = useStore();
+    const theme : string = await store.get('theme') || "theme-default";
+
+   document.body.classList.forEach((item) => {
+       if(item.includes('theme-')) {
+           document.body.classList.remove(item);
+       }
+   })
+
+    document.body.classList.add(theme);
+}

@@ -1,4 +1,54 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+:root {
+    --color-bg-shade-1: rgb(25 25 25 / 10%);
+    --color-bg-shade-2: rgb(25 25 25 / 10%);
+    --color-bg-shade-3: rgb(25 25 25 / 10%);
+    --color-bg-default: rgb(0 0 0 / 10%);
+    --color-bg-shade-5: rgb(0 0 0 / 20%);
+    --color-bg-shade-6: rgb(0 0 0 / 40%);
+    --color-bg-shade-9: rgb(0 0 0 / 80%);
+
+    --color-text-default: rgb(233 233 233);
+    --color-text-shade-3: rgb(203 203 203);
+    --color-text-shade-1: rgb(117 117 124);
+
+    --color-blue: 40 219 231;
+    --color-green: 158 228 68;
+    --color-yellow: 254 206 35;
+    --color-orange: 231 132 40;
+    --color-red: 232 78 115;
+}
+
+.theme-dark {
+    --color-bg-shade-1: rgb(161, 162, 162);
+    --color-bg-shade-2: rgb(123, 145, 145);
+    --color-bg-shade-3: rgb(78, 82, 82);
+    --color-bg-default: rgb(46, 51, 51);
+    --color-bg-shade-5: rgb(26, 29, 29);
+    --color-bg-shade-6: rgb(12, 14, 14);
+    --color-bg-shade-9: rgb(4, 6, 6);
+
+
+    --color-text-default: #ffffff;
+    --color-text-shade-3: #ffffff;
+    --color-text-shade-1: #ffffff;
+
+}
+
+.theme-light {
+    --color-bg-shade-1: rgb(94, 93, 93);
+    --color-bg-shade-2: rgb(132, 110, 110);
+    --color-bg-shade-3: rgb(177, 173, 173);
+    --color-bg-default: rgb(209, 204, 204);
+    --color-bg-shade-5: rgb(229, 226, 226);
+    --color-bg-shade-6: rgb(243, 241, 241);
+    --color-bg-shade-9: rgb(251, 249, 249);
+
+    --color-text-default: #000000;
+    --color-text-shade-3: #000000;
+    --color-text-shade-1: #000000;
+}

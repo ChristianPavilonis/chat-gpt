@@ -1,5 +1,5 @@
 <template>
-    <div class="text-white flex">
+    <div class="flex">
         <Sidebar/>
         <div class="container mx-auto overflow-y-auto">
             <RouterView/>
@@ -12,16 +12,17 @@
 import {inject, onMounted} from "vue";
 import {Store} from "tauri-plugin-store-api";
 import {useRouter} from "vue-router";
-import {createConversation, shortcut} from "./Lib/helpers";
+import {createConversation, setTheme, shortcut, useStore} from "./Lib/helpers";
 import Sidebar from "./components/Sidebar.vue";
 
+const store = useStore();
 const router = useRouter();
 
 function navigateToSettings() {
     router.push("/settings");
 }
 
-onMounted(() => {
+onMounted(async () => {
     shortcut({
         key: ",",
         modifier: true,
@@ -33,10 +34,12 @@ onMounted(() => {
     shortcut({
         key: "n",
         modifier: true,
-        handler(event) : void {
+        handler(event): void {
             createConversation(router)
         }
-    })
+    });
+
+    await setTheme();
 });
 
 </script>

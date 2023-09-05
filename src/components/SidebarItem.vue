@@ -1,8 +1,8 @@
 <template>
     <RouterLink
         :to="`/conversation/${conversation.id}`"
-        class="px-20 py-16 flex hover:bg-black/30 relative"
-        :class="isCurrentConversation(conversation.id) ? 'bg-black/30' : ''"
+        class="px-20 py-16 flex hover:bg-shade-6 relative"
+        :class="isCurrentConversation(conversation.id) ? 'bg-shade-6' : ''"
     >
         <svg
             class="w-24 h-24 mr-12"

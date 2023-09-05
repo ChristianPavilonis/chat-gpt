@@ -1,6 +1,6 @@
 <template>
     <div class="min-w-280">
-        <div class="bg-black/20 w-280 h-[100vh] flex flex-col justify-between overflow-y-auto fixed z-1">
+        <div class="bg-shade-5 w-280 h-[100vh] flex flex-col justify-between overflow-y-auto fixed z-1">
             <div>
                 <SidebarItem
                     v-for="conversation in conversationsStore.conversations"
