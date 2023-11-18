@@ -132,9 +132,10 @@ async function generateTitle() {
 
 async function saveConversation() {
     const data = conversation.value;
+    const last_modified = Date.now();
 
     await invoke("save_conversation", {
-        conversation: data,
+        conversation: { ...data, last_modified },
     });
 
     conversationStore.updateConversation(data);
@@ -164,6 +165,8 @@ async function initConversation() {
         conversation.value.id = route.params.id;
         resetConversation();
     }
+
+    store.set("last-conversation", conversation.value.id);
 }
 
 async function deleteConversation() {

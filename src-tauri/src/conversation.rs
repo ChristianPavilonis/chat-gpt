@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::fs;
@@ -10,6 +11,7 @@ pub struct Conversation {
     id: String,
     messages: Vec<Message>,
     title: Option<String>,
+    last_modified: Option<usize>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -70,7 +72,7 @@ pub fn load_conversation<P: AsRef<Path>>(path: P) -> Result<Conversation, String
     let mut file = File::open(path).map_err(|e| e.to_string())?;
     file.read_to_string(&mut json).map_err(|e| e.to_string())?;
 
-    let conversation = serde_json::from_str(&json).map_err(|e| format!("serde: {}", e))?;
+    let conversation = serde_json::from_str(&json).map_err(|e| format!("could not serialize conversation: {}", e))?;
 
     Ok(conversation)
 }
@@ -106,7 +108,7 @@ pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, Str
 
     let dir = fs::read_dir(path).map_err(|e| format!("{e}"))?;
 
-    let conversations = dir
+    let mut conversations = dir
         .into_iter()
         .flatten()
         .flat_map(|file| {
@@ -129,7 +131,27 @@ pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, Str
                 }
             }
         })
-        .collect();
+        .collect::<Vec<Conversation>>();
+
+        conversations.sort_by_key(|c| c.last_modified.unwrap_or(0) as isize * -1);
 
     Ok(conversations)
+}
+
+#[tauri::command]
+pub fn search_conversation(
+    app: tauri::AppHandle,
+    conversation_id: String,
+    search: String,
+) -> Result<Conversation, String> {
+    let mut conversation = get_conversation(app, conversation_id)?;
+
+    let regex = Regex::new(format!("({})", search).as_str()).map_err(|_| "Invalid Regex".to_string())?;
+    
+    conversation.messages.iter_mut().for_each(|message| {
+        regex.replace_all(message.content.as_str(), "");
+    });
+
+
+    return Ok(conversation);
 }

@@ -90,7 +90,7 @@ export async function createConversation(router: Router) {
     let store = useConversationsStore();
 
     await router.push(`/conversation/${id}`);
-    store.pushConversation({id})
+    store.pushConversation({id});
 }
 
 export async function setTheme() {

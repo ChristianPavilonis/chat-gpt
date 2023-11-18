@@ -36,6 +36,7 @@
                     name="model"
                     id="model"
             >
+                <option value="gpt-4-1106-preview">GPT-4 Turbo</option>
                 <option value="gpt-4">GPT 4</option>
                 <option value="gpt-3.5-turbo">GPT 3.5 Turbo</option>
             </select>
@@ -92,7 +93,7 @@ onMounted(async () => {
     const key: string | null = await store.get("openai-key");
     openApiKey.value = key || ""
 
-    model.value = await store.get("ai-model") || "gpt-3.5-turbo";
+    model.value = await store.get("ai-model") || "gpt-4-1106-preview";
 
     theme.value = await store.get("theme") || "theme-default";
 

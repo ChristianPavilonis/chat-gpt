@@ -10,10 +10,20 @@
 </template>
 
 <script lang="ts" setup>
-import {createConversation} from "../Lib/helpers";
+import {createConversation, useStore} from "../Lib/helpers";
 import {useRouter} from "vue-router";
+import { onMounted } from "vue";
 
 const router = useRouter();
+const store = useStore();
+
+onMounted(async () => {
+    let conversationId = await store.get<string>("last-conversation");
+
+    if(conversationId) {
+        router.push(`conversation/${conversationId}`);
+    }
+})
 
 </script>
 
