@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { OpenAIApi } from "openai";
+import OpenAI from "openai";
 import ChatBox from "../components/ChatBox.vue";
 import "highlight.js/styles/github-dark-dimmed.css";
 import AsyncIndicator from "../components/AsyncIndicator.vue";
@@ -63,7 +63,7 @@ const input = ref("");
 const loading = ref(false);
 const route = useRoute();
 const router = useRouter();
-const openai = ref<OpenAIApi>();
+const openai = ref<OpenAI>();
 const systemPrompt = ref("You are a helpful assistant");
 const displayMessages = computed(() => {
     return conversation.value.messages.filter(

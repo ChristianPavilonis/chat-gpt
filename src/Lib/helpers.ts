@@ -72,9 +72,9 @@ export async function createOpenAiClient() {
         throw new Error("Key not set");
     }
 
-
     return new OpenAI({
         apiKey: key,
+        dangerouslyAllowBrowser: true,
     });
 }
 
