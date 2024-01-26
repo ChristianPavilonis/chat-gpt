@@ -1,18 +1,23 @@
 <template>
     <div class="flex">
-        <Sidebar/>
+        <Sidebar />
         <div class="container mx-auto overflow-y-auto">
-            <RouterView/>
+            <RouterView />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-
-import {inject, onMounted} from "vue";
-import {Store} from "tauri-plugin-store-api";
-import {useRouter} from "vue-router";
-import {createConversation, setTheme, shortcut, useStore} from "./Lib/helpers";
+import { inject, onMounted } from "vue";
+import { Store } from "tauri-plugin-store-api";
+import { useRouter } from "vue-router";
+import {
+    createConversation,
+    newWindow,
+    setTheme,
+    shortcut,
+    useStore,
+} from "./Lib/helpers";
 import Sidebar from "./components/Sidebar.vue";
 
 const store = useStore();
@@ -35,14 +40,20 @@ onMounted(async () => {
         key: "n",
         modifier: true,
         handler(event): void {
-            createConversation(router)
-        }
+            createConversation(router);
+        },
+    });
+
+    shortcut({
+        key: "N",
+        modifier: true,
+        handler(event): void {
+            newWindow();
+        },
     });
 
     await setTheme();
 });
-
 </script>
 
-<style>
-</style>
+<style></style>

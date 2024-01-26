@@ -2,27 +2,21 @@
     <div class="w-full relative pt-32" ref="container">
         <div class="fixed bg-shade-9 top-0 flex justify-between items-center" ref="bar">
             <div>
-                <input
-                    class="focus:bg-shade-6 bg-transparent py-8 px-12"
-                    v-model="systemPrompt"
-                    type="text"
-                >
+                <input class="focus:bg-shade-6 bg-transparent py-8 px-12" v-model="systemPrompt" type="text" />
             </div>
             <!--            <Find :conversation="conversation"/>-->
             <button class="p-20 rounded hover:bg-shade-6" @click="deleteConversation">
-                <IconTrash/>
+                <IconTrash />
             </button>
         </div>
 
         <div class="max-w-800 mx-auto pt-20 pb-80">
             <div class="space-y-12">
-                <div
-                    v-for="(message, index) in displayMessages"
-                    class="flex rounded-md max-w-800 px-25 py-18"
-                    :class="message.role === 'assistant' ? 'ml-auto bg-shade-9': 'mr-auto bg-shade-5'"
-                    :id="'message-'+index"
-                >
-                    <Markdown :message="message"/>
+                <div v-for="(message, index) in displayMessages" class="flex rounded-md max-w-800 px-25 py-18" :class="message.role === 'assistant'
+                        ? 'ml-auto bg-shade-9'
+                        : 'mr-auto bg-shade-5'
+                    " :id="'message-' + index">
+                    <Markdown :message="message" />
                 </div>
             </div>
 
@@ -32,14 +26,8 @@
 
             <div class="fixed bottom-10 container w-full">
                 <div class="max-w-800">
-                    <AsyncIndicator
-                        v-if="loading"
-                        class="w-50 h-50 mx-auto mb-24 stroke-current"
-                    />
-                    <ChatBox
-                        v-model="input"
-                        @submit="sendMessage"
-                    />
+                    <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current" />
+                    <ChatBox v-model="input" @submit="sendMessage" />
                 </div>
             </div>
         </div>
@@ -47,15 +35,20 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, ref, watch} from 'vue';
-import {OpenAIApi} from "openai";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { OpenAIApi } from "openai";
 import ChatBox from "../components/ChatBox.vue";
-import 'highlight.js/styles/github-dark-dimmed.css';
+import "highlight.js/styles/github-dark-dimmed.css";
 import AsyncIndicator from "../components/AsyncIndicator.vue";
-import {createOpenAiClient, sendChatMessage, shortcut, useStore} from "../Lib/helpers";
-import {invoke} from "@tauri-apps/api";
-import {useRoute, useRouter} from "vue-router";
-import {useConversationsStore} from "../Lib/ConversationsStore";
+import {
+    createOpenAiClient,
+    sendChatMessage,
+    shortcut,
+    useStore,
+} from "../Lib/helpers";
+import { invoke } from "@tauri-apps/api";
+import { useRoute, useRouter } from "vue-router";
+import { useConversationsStore } from "../Lib/ConversationsStore";
 import Markdown from "../components/Markdown.vue";
 import IconTrash from "../components/Icons/IconTrash.vue";
 
@@ -73,15 +66,20 @@ const router = useRouter();
 const openai = ref<OpenAIApi>();
 const systemPrompt = ref("You are a helpful assistant");
 const displayMessages = computed(() => {
-    return conversation.value.messages.filter((msg: any) => msg.role !== "system");
+    return conversation.value.messages.filter(
+        (msg: any) => msg.role !== "system",
+    );
 });
 
 const container = ref<HTMLElement>();
 const bar = ref<HTMLElement>();
 
-watch(() => route.params.id, () => initConversation());
+watch(
+    () => route.params.id,
+    () => initConversation(),
+);
 watch(systemPrompt, () => {
-    conversation.value.messages[0].content = systemPrompt.value
+    conversation.value.messages[0].content = systemPrompt.value;
 });
 
 async function sendMessage() {
@@ -90,14 +88,17 @@ async function sendMessage() {
     }
 
     loading.value = true;
-    await pushMessage({role: "user", content: input.value});
+    await pushMessage({ role: "user", content: input.value });
     input.value = "";
 
     try {
         // @ts-ignore
-        const response = await sendChatMessage(openai.value, conversation.value.messages);
+        const response = await sendChatMessage(
+            openai.value,
+            conversation.value.messages,
+        );
 
-        await pushMessage(response)
+        await pushMessage(response);
 
         if (conversation.value.title == null) {
             generateTitle();
@@ -121,10 +122,14 @@ async function generateTitle() {
         return;
     }
 
-    const response = await sendChatMessage(openai.value, [...conversation.value.messages, {
-        role: "user",
-        content: "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations."
-    }]);
+    const response = await sendChatMessage(openai.value, [
+        ...conversation.value.messages,
+        {
+            role: "user",
+            content:
+                "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations.",
+        },
+    ]);
     conversation.value.title = response?.content || "";
 
     await saveConversation();
@@ -142,9 +147,12 @@ async function saveConversation() {
 }
 
 function resetConversation() {
-    conversation.value.messages = [{
-        role: "system", content: systemPrompt.value,
-    }];
+    conversation.value.messages = [
+        {
+            role: "system",
+            content: systemPrompt.value,
+        },
+    ];
     conversation.value.title = null;
 
     saveConversation();
@@ -157,7 +165,7 @@ async function scrollToBottom() {
 
 async function initConversation() {
     try {
-        conversation.value = await invoke('get_conversation', {
+        conversation.value = await invoke("get_conversation", {
             conversationId: route.params.id as string,
         });
         systemPrompt.value = conversation.value.messages[0].content;
@@ -170,6 +178,8 @@ async function initConversation() {
 }
 
 async function deleteConversation() {
+    console.log(route.params.id as string);
+
     await invoke("delete_conversation", {
         conversationId: route.params.id as string,
     });
@@ -206,9 +216,6 @@ onMounted(async () => {
     window.onresize = setBarWidth;
     setBarWidth();
 });
-
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

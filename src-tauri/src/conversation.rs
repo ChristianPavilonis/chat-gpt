@@ -1,6 +1,7 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use tauri::AppHandle;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
@@ -20,7 +21,7 @@ pub struct Message {
     content: String,
 }
 
-fn conversation_path(app: tauri::AppHandle, conversation_id: &String) -> Option<String> {
+fn conversation_path(app: AppHandle, conversation_id: &String) -> Option<String> {
     let mut path = match app.path_resolver().app_data_dir() {
         Some(path) => path.to_string_lossy().to_string(),
         None => {
@@ -32,7 +33,7 @@ fn conversation_path(app: tauri::AppHandle, conversation_id: &String) -> Option<
 }
 
 #[tauri::command]
-pub fn save_conversation(app: tauri::AppHandle, conversation: Conversation) -> Result<(), String> {
+pub fn save_conversation(app: AppHandle, conversation: Conversation) -> Result<(), String> {
     let path = match conversation_path(app, &conversation.id) {
         Some(path) => path,
         None => {
@@ -51,7 +52,7 @@ pub fn save_conversation(app: tauri::AppHandle, conversation: Conversation) -> R
 }
 
 #[tauri::command]
-pub fn delete_conversation(app: tauri::AppHandle, conversation_id: String) -> Result<(), String> {
+pub fn delete_conversation(app: AppHandle, conversation_id: String) -> Result<(), String> {
     let path = match conversation_path(app, &conversation_id) {
         Some(path) => path,
         None => {
@@ -72,14 +73,15 @@ pub fn load_conversation<P: AsRef<Path>>(path: P) -> Result<Conversation, String
     let mut file = File::open(path).map_err(|e| e.to_string())?;
     file.read_to_string(&mut json).map_err(|e| e.to_string())?;
 
-    let conversation = serde_json::from_str(&json).map_err(|e| format!("could not serialize conversation: {}", e))?;
+    let conversation = serde_json::from_str(&json)
+        .map_err(|e| format!("could not serialize conversation: {}", e))?;
 
     Ok(conversation)
 }
 
 #[tauri::command]
 pub fn get_conversation(
-    app: tauri::AppHandle,
+    app: AppHandle,
     conversation_id: String,
 ) -> Result<Conversation, String> {
     let path = match conversation_path(app, &conversation_id) {
@@ -98,7 +100,7 @@ pub fn get_conversation(
 }
 
 #[tauri::command]
-pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, String> {
+pub fn get_conversations(app: AppHandle) -> Result<Vec<Conversation>, String> {
     let path = match conversation_path(app, &"".to_string()) {
         Some(path) => path,
         None => {
@@ -133,25 +135,25 @@ pub fn get_conversations(app: tauri::AppHandle) -> Result<Vec<Conversation>, Str
         })
         .collect::<Vec<Conversation>>();
 
-        conversations.sort_by_key(|c| c.last_modified.unwrap_or(0) as isize * -1);
+    conversations.sort_by_key(|c| c.last_modified.unwrap_or(0) as isize * -1);
 
     Ok(conversations)
 }
 
 #[tauri::command]
 pub fn search_conversation(
-    app: tauri::AppHandle,
+    app: AppHandle,
     conversation_id: String,
     search: String,
 ) -> Result<Conversation, String> {
     let mut conversation = get_conversation(app, conversation_id)?;
 
-    let regex = Regex::new(format!("({})", search).as_str()).map_err(|_| "Invalid Regex".to_string())?;
-    
+    let regex =
+        Regex::new(format!("({})", search).as_str()).map_err(|_| "Invalid Regex".to_string())?;
+
     conversation.messages.iter_mut().for_each(|message| {
         regex.replace_all(message.content.as_str(), "");
     });
-
 
     return Ok(conversation);
 }
