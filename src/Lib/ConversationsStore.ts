@@ -1,13 +1,12 @@
-import {defineStore} from "pinia";
-import {invoke} from "@tauri-apps/api";
-
+import { defineStore } from "pinia";
+import { invoke } from "@tauri-apps/api";
 
 interface ConversationsStore {
     activeConversation: any;
     conversations: any[];
 }
 
-export const useConversationsStore = defineStore('ConversationsStore', {
+export const useConversationsStore = defineStore("ConversationsStore", {
     state: (): ConversationsStore => ({
         activeConversation: {},
         conversations: [],
@@ -16,7 +15,6 @@ export const useConversationsStore = defineStore('ConversationsStore', {
     getters: {},
 
     actions: {
-
         setConversations(conversations: any) {
             this.conversations = conversations;
         },
@@ -27,18 +25,30 @@ export const useConversationsStore = defineStore('ConversationsStore', {
 
         updateConversation(newConversation: any) {
             let index = this.conversations.findIndex(
-                (conversation) => conversation.id === newConversation.id
+                (conversation) => conversation.id === newConversation.id,
             );
 
             this.conversations[index] = newConversation;
         },
 
+        async saveConversation(conversation: any) {
+            let result = await invoke("save_conversation", {
+                conversation,
+            });
+
+            result.id = result.id.id.String;
+
+            return result;
+        },
+
         async loadConversations() {
-            let conversations = await invoke("get_conversations");
+            let conversations: any[] = await invoke("get_conversations");
+
+            conversations = conversations.map((c: any) => {
+                return { ...c, id: c.id.id.String };
+            });
 
             this.setConversations(conversations);
-        }
-
+        },
     },
-
 });
