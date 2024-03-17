@@ -73,7 +73,8 @@ pub async fn get_conversation(conversation_id: &str) -> Result<Conversation, Str
         .select(("conversations", conversation_id))
         .await
         .map_err(|e| format!("{}", e))?;
-    Ok(conversation.unwrap())
+
+    Ok(conversation.ok_or("conversation not found".to_string())?)
 }
 
 #[tauri::command]

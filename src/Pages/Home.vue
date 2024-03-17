@@ -13,11 +13,11 @@
 import { useStore } from "../Lib/helpers";
 import { useRouter } from "vue-router";
 import { onMounted } from "vue";
-import { useConversationStore } from "../Lib/ConversationsStore.ts";
+import { useConversationsStore } from "../Lib/ConversationsStore.ts";
 
 const router = useRouter();
 const store = useStore();
-const conversations = useConversationStore();
+const conversations = useConversationsStore();
 
 onMounted(async () => {
     let conversationId = await store.get<string>("last-conversation");
