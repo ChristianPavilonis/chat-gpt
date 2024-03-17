@@ -86,7 +86,6 @@ export async function sendChatMessage(
     openai: OpenAI,
     messages: OpenAI.Chat.CreateChatCompletionRequestMessage[],
 ): Promise<OpenAI.Chat.CreateChatCompletionRequestMessage | undefined> {
-    return { role: "assistant", content: "hi" };
     const store = useStore();
     const model: string = (await store.get("ai-model")) || "gpt-3.5-turbo";
 
@@ -100,19 +99,6 @@ export async function sendChatMessage(
 
         return choice.message;
     }
-}
-
-export async function createConversation(router: Router) {
-    let store = useConversationsStore();
-
-    let conversation = await store.saveConversation({
-        last_modified: Date.now(),
-        messages: [],
-        title: "New Chat",
-    });
-
-    await router.push(`/conversation/${conversation.id}`);
-    store.pushConversation(conversation);
 }
 
 export async function setTheme() {

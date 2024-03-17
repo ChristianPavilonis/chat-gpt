@@ -2,7 +2,7 @@
     <div class="flex justify-center items-center h-[100vh]">
         <button
             class="px-12 py-8 bg-shade-6 rounded uppercase"
-            @click="createConversation(router)"
+            @click="conversations.createConversation(router)"
         >
             new chat +
         </button>
@@ -10,23 +10,22 @@
 </template>
 
 <script lang="ts" setup>
-import {createConversation, useStore} from "../Lib/helpers";
-import {useRouter} from "vue-router";
+import { useStore } from "../Lib/helpers";
+import { useRouter } from "vue-router";
 import { onMounted } from "vue";
+import { useConversationStore } from "../Lib/ConversationsStore.ts";
 
 const router = useRouter();
 const store = useStore();
+const conversations = useConversationStore();
 
 onMounted(async () => {
     let conversationId = await store.get<string>("last-conversation");
 
-    if(conversationId) {
+    if (conversationId) {
         router.push(`conversation/${conversationId}`);
     }
-})
-
+});
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

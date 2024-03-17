@@ -29,6 +29,7 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             );
 
             this.conversations[index] = newConversation;
+            console.log(newConversation);
         },
 
         async saveConversation(conversation: any) {
@@ -37,6 +38,8 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             });
 
             result.id = result.id.id.String;
+
+            this.updateConversation(result);
 
             return result;
         },
@@ -49,6 +52,17 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             });
 
             this.setConversations(conversations);
+        },
+
+        async createConversation(router: Router) {
+            let conversation = await this.saveConversation({
+                last_modified: Date.now(),
+                messages: [],
+                title: "New Chat",
+            });
+
+            await router.push(`/conversation/${conversation.id}`);
+            this.pushConversation(conversation);
         },
     },
 });
