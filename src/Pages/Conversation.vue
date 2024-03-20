@@ -1,32 +1,54 @@
 <template>
     <div class="w-full relative pt-32" ref="container">
-        <div class="fixed bg-shade-9 top-0 flex justify-between items-center" ref="bar">
+        <div
+            class="fixed bg-shade-9 top-0 flex justify-between items-center"
+            ref="bar"
+        >
             <div>
-                <input class="focus:bg-shade-6 bg-transparent py-8 px-12" v-model="systemPrompt" type="text" />
+                <input
+                    class="focus:bg-shade-6 bg-transparent py-8 px-12"
+                    v-model="systemPrompt"
+                    type="text"
+                />
             </div>
             <!--            <Find :conversation="conversation"/>-->
-            <button class="p-20 rounded hover:bg-shade-6" @click="deleteConversation">
+            <button
+                class="p-20 rounded hover:bg-shade-6"
+                @click="deleteConversation"
+            >
                 <IconTrash />
             </button>
         </div>
 
         <div class="max-w-800 mx-auto pt-20 pb-80">
             <div class="space-y-12">
-                <div v-for="(message, index) in displayMessages" class="flex rounded-md max-w-800 px-25 py-18" :class="message.role === 'assistant'
-                        ? 'ml-auto bg-shade-9'
-                        : 'mr-auto bg-shade-5'
-                    " :id="'message-' + index">
+                <div
+                    v-for="(message, index) in displayMessages"
+                    class="flex rounded-md max-w-800 px-25 py-18"
+                    :class="
+                        message.role === 'assistant'
+                            ? 'ml-auto bg-shade-9'
+                            : 'mr-auto bg-shade-5'
+                    "
+                    :id="'message-' + index"
+                >
                     <Markdown :message="message" />
                 </div>
             </div>
 
-            <div v-if="!openai" class="h-600 w-full flex justify-center items-center">
+            <div
+                v-if="!openai"
+                class="h-600 w-full flex justify-center items-center"
+            >
                 <p class="text-2xl">Set your api key (⌘ + ,)</p>
             </div>
 
             <div class="fixed bottom-10 container w-full">
                 <div class="max-w-800">
-                    <AsyncIndicator v-if="loading" class="w-50 h-50 mx-auto mb-24 stroke-current" />
+                    <AsyncIndicator
+                        v-if="loading"
+                        class="w-50 h-50 mx-auto mb-24 stroke-current"
+                    />
                     <ChatBox v-model="input" @submit="sendMessage" />
                 </div>
             </div>
@@ -148,10 +170,7 @@ async function saveConversation() {
     const data = conversation.value;
     const last_modified = Date.now();
 
-    await invoke("save_conversation", {
-        conversation: { ...data, last_modified },
-    });
-
+    conversationStore.saveConversation({ ...data, last_modified });
     conversationStore.updateConversation(data);
 }
 
