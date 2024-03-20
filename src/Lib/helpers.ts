@@ -104,16 +104,11 @@ export async function sendChatMessage(
 }
 
 export async function createConversation(router: Router) {
+    const id = uuidV4();
     let store = useConversationsStore();
 
-    let conversation = await store.saveConversation({
-        last_modified: Date.now(),
-        messages: [],
-        title: "New Chat",
-    });
-
-    await router.push(`/conversation/${conversation.id}`);
-    store.pushConversation(conversation);
+    await router.push(`/conversation/${id}`);
+    store.pushConversation({ id });
 }
 
 export async function setTheme() {

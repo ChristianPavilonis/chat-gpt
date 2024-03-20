@@ -145,17 +145,14 @@ async function generateTitle() {
 }
 
 async function saveConversation() {
-    const data: any = conversation.value;
+    const data = conversation.value;
     const last_modified = Date.now();
 
-    data.id = { id: { String: data.id }, tb: "conversations" };
-
-    conversation.value = await conversationStore.saveConversation({
-        ...data,
-        last_modified,
+    await invoke("save_conversation", {
+        conversation: { ...data, last_modified },
     });
 
-    conversationStore.updateConversation(conversation.value);
+    conversationStore.updateConversation(data);
 }
 
 function resetConversation() {
@@ -180,7 +177,6 @@ async function initConversation() {
         conversation.value = await invoke("get_conversation", {
             conversationId: route.params.id as string,
         });
-        conversation.value.id = conversation.value.id.id.String;
         systemPrompt.value = conversation.value.messages[0].content;
     } catch (error) {
         conversation.value.id = route.params.id;
