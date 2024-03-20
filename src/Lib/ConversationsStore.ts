@@ -29,7 +29,6 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             );
 
             this.conversations[index] = newConversation;
-            console.log(newConversation);
         },
 
         async saveConversation(conversation: any) {
@@ -38,8 +37,6 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             });
 
             result.id = result.id.id.String;
-
-            this.updateConversation(result);
 
             return result;
         },

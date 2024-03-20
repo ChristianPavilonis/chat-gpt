@@ -1,8 +1,6 @@
 <template>
     <div class="min-w-280">
-        <div
-            class="bg-shade-5 w-280 h-[100vh] flex flex-col justify-between overflow-y-auto fixed z-1"
-        >
+        <div class="bg-shade-5 w-280 h-[100vh] flex flex-col justify-between overflow-y-auto fixed z-1">
             <div>
                 <SidebarItem
                     v-for="conversation in conversationsStore.conversations"
@@ -12,7 +10,7 @@
             <div>
                 <button
                     class="w-full py-16 border-t border-white/20 flex items-center justify-center"
-                    @click="conversationsStore.createConversation(router)"
+                    @click="createConversation(router)"
                 >
                     New Chat
                     <svg
@@ -23,11 +21,7 @@
                         stroke="currentColor"
                         class="w-24 h-24"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M12 4.5v15m7.5-7.5h-15"
-                        />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
                 </button>
             </div>
@@ -36,15 +30,16 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from "vue";
-import { useConversationsStore } from "../Lib/ConversationsStore";
-import { invoke } from "@tauri-apps/api";
-import { storeToRefs } from "pinia";
-import { useRoute, useRouter } from "vue-router";
+import {onMounted} from 'vue';
+import {useConversationsStore} from "../Lib/ConversationsStore";
+import {invoke} from "@tauri-apps/api";
+import {storeToRefs} from "pinia";
+import {createConversation} from "../Lib/helpers";
+import {useRoute, useRouter} from "vue-router";
 import SidebarItem from "./SidebarItem.vue";
 
 let conversationsStore = useConversationsStore();
-let { conversations } = storeToRefs(conversationsStore);
+let {conversations} = storeToRefs(conversationsStore);
 let router = useRouter();
 let route = useRoute();
 
@@ -57,4 +52,6 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

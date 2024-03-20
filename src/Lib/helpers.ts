@@ -103,6 +103,19 @@ export async function sendChatMessage(
     }
 }
 
+export async function createConversation(router: Router) {
+    let store = useConversationsStore();
+
+    let conversation = await store.saveConversation({
+        last_modified: Date.now(),
+        messages: [],
+        title: "New Chat",
+    });
+
+    await router.push(`/conversation/${conversation.id}`);
+    store.pushConversation(conversation);
+}
+
 export async function setTheme() {
     const store = useStore();
     const theme: string = (await store.get("theme")) || "theme-default";
