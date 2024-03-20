@@ -147,6 +147,7 @@ async function generateTitle() {
     if (!openai.value) {
         return;
     }
+    conversation.value.title = "";
 
     await sendChatMessage(
         openai.value,
@@ -206,12 +207,11 @@ async function initConversation() {
 }
 
 async function deleteConversation() {
-    console.log(route.params.id as string);
-
     await invoke("delete_conversation", {
         conversationId: route.params.id as string,
     });
 
+    store.set("last-conversation", null);
     await conversationStore.loadConversations();
     await router.push("/");
 }
