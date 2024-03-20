@@ -84,20 +84,22 @@ export function useStore() {
 
 export async function sendChatMessage(
     openai: OpenAI,
-    messages: OpenAI.Chat.CreateChatCompletionRequestMessage[],
-): Promise<OpenAI.Chat.CreateChatCompletionRequestMessage | undefined> {
+    messages: OpenAI.Chat.ChatCompletionMessageParam[],
+    callback: (chunk: string) => void,
+): Promise<void> {
     const store = useStore();
     const model: string = (await store.get("ai-model")) || "gpt-3.5-turbo";
 
-    const completion = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
         model,
         messages,
+        stream: true,
     });
-
-    if (completion.choices.length > 0) {
-        const choice = completion.choices[0];
-
-        return choice.message;
+    for await (const chunk of stream) {
+        let value = chunk.choices[0]?.delta?.content;
+        if (value != undefined) {
+            callback(value);
+        }
     }
 }
 

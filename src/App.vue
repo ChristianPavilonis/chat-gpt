@@ -13,7 +13,7 @@ import { Store } from "tauri-plugin-store-api";
 import { useRouter } from "vue-router";
 import { newWindow, setTheme, shortcut, useStore } from "./Lib/helpers";
 import Sidebar from "./components/Sidebar.vue";
-import { useConversationsStore } from "./Lib/ConversationsStore.ts";
+import { useConversationsStore } from "./Lib/ConversationsStore";
 
 const store = useStore();
 const router = useRouter();

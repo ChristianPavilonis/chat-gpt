@@ -87,14 +87,14 @@ const route = useRoute();
 const router = useRouter();
 const openai = ref<OpenAI>();
 const systemPrompt = ref("You are a helpful assistant");
+const container = ref<HTMLElement>();
+const bar = ref<HTMLElement>();
+
 const displayMessages = computed(() => {
     return conversation.value.messages.filter(
         (msg: any) => msg.role !== "system",
     );
 });
-
-const container = ref<HTMLElement>();
-const bar = ref<HTMLElement>();
 
 watch(
     () => route.params.id,
@@ -114,13 +114,17 @@ async function sendMessage() {
     input.value = "";
 
     try {
+        await pushMessage({ role: "assistant", content: "" });
+
         // @ts-ignore
-        const response = await sendChatMessage(
+        await sendChatMessage(
             openai.value,
             conversation.value.messages,
+            (chunk) => {
+                let messageIndex = conversation.value.messages.length - 1;
+                conversation.value.messages[messageIndex].content += chunk;
+            },
         );
-
-        await pushMessage(response);
 
         if (conversation.value.title == null) {
             generateTitle();
@@ -144,15 +148,20 @@ async function generateTitle() {
         return;
     }
 
-    const response = await sendChatMessage(openai.value, [
-        ...conversation.value.messages,
-        {
-            role: "user",
-            content:
-                "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations.",
+    await sendChatMessage(
+        openai.value,
+        [
+            ...conversation.value.messages,
+            {
+                role: "user",
+                content:
+                    "without any preface, create a 2-5 word title for this conversation as a helpful reminder to what it is about. Do not use any quotations.",
+            },
+        ],
+        (chunk) => {
+            conversation.value.title += chunk;
         },
-    ]);
-    conversation.value.title = response?.content || "";
+    );
 
     await saveConversation();
 }

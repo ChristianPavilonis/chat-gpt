@@ -33,7 +33,7 @@ export const useConversationsStore = defineStore("ConversationsStore", {
         },
 
         async saveConversation(conversation: any) {
-            let result = await invoke("save_conversation", {
+            let result: any = await invoke("save_conversation", {
                 conversation,
             });
 
@@ -54,8 +54,8 @@ export const useConversationsStore = defineStore("ConversationsStore", {
             this.setConversations(conversations);
         },
 
-        async createConversation(router: Router) {
-            let conversation = await this.saveConversation({
+        async createConversation(router: any) {
+            let conversation: any = await this.saveConversation({
                 last_modified: Date.now(),
                 messages: [],
                 title: "New Chat",
