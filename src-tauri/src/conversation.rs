@@ -1,11 +1,11 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use tauri::AppHandle;
-use std::fs;
+use std::fs::{self, remove_file};
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
+use tauri::AppHandle;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Conversation {
@@ -63,15 +63,16 @@ pub fn delete_conversation(app: AppHandle, conversation_id: String) -> Result<()
         }
     };
 
-    std::fs::remove_file(path).map_err(|_| "Could not delete file".to_string())?;
+    remove_file(path).map_err(|e| format!("could not delete file: {}", e))?;
 
     Ok(())
 }
 
 pub fn load_conversation<P: AsRef<Path>>(path: P) -> Result<Conversation, String> {
     let mut json = String::new();
-    let mut file = File::open(path).map_err(|e| e.to_string())?;
-    file.read_to_string(&mut json).map_err(|e| e.to_string())?;
+    let mut file = File::open(path).map_err(|e| format!("could not open file {}", e))?;
+    file.read_to_string(&mut json)
+        .map_err(|e| format!("could not read file {}", e))?;
 
     let conversation = serde_json::from_str(&json)
         .map_err(|e| format!("could not serialize conversation: {}", e))?;
@@ -80,10 +81,7 @@ pub fn load_conversation<P: AsRef<Path>>(path: P) -> Result<Conversation, String
 }
 
 #[tauri::command]
-pub fn get_conversation(
-    app: AppHandle,
-    conversation_id: String,
-) -> Result<Conversation, String> {
+pub fn get_conversation(app: AppHandle, conversation_id: String) -> Result<Conversation, String> {
     let path = match conversation_path(app, &conversation_id) {
         Some(path) => path,
         None => {
@@ -108,7 +106,7 @@ pub fn get_conversations(app: AppHandle) -> Result<Vec<Conversation>, String> {
         }
     };
 
-    let dir = fs::read_dir(path).map_err(|e| format!("{e}"))?;
+    let dir = fs::read_dir(path).map_err(|e| format!("could not read all files {e}"))?;
 
     let mut conversations = dir
         .into_iter()
@@ -128,7 +126,7 @@ pub fn get_conversations(app: AppHandle) -> Result<Vec<Conversation>, String> {
             match load_conversation(file_path) {
                 Ok(convo) => Some(convo),
                 Err(e) => {
-                    println!("{:?}", e);
+                    println!("error loading conversation {}", e);
                     None
                 }
             }
