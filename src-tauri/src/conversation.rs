@@ -1,11 +1,11 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::fs::{self, remove_file};
 use std::fs::File;
+use std::fs::{self, remove_file};
 use std::io::{Read, Write};
 use std::path::Path;
-use tauri::AppHandle;
+use tauri::{App, AppHandle};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Conversation {
@@ -21,15 +21,19 @@ pub struct Message {
     content: String,
 }
 
-fn conversation_path(app: AppHandle, conversation_id: &String) -> Option<String> {
-    let mut path = match app.path_resolver().app_data_dir() {
-        Some(path) => path.to_string_lossy().to_string(),
+fn data_dir(app: AppHandle) -> Option<String> {
+    match app.path_resolver().app_data_dir() {
+        Some(path) => Some(path.to_string_lossy().to_string()),
         None => {
             return None;
         }
-    };
+    }
+}
 
-    Some(format!("{path}/{}", conversation_id))
+fn conversation_path(app: AppHandle, conversation_id: &String) -> Option<String> {
+    let path = data_dir(app)?;
+
+    Some(format!("{path}/{}.json", conversation_id))
 }
 
 #[tauri::command]
@@ -99,7 +103,7 @@ pub fn get_conversation(app: AppHandle, conversation_id: String) -> Result<Conve
 
 #[tauri::command]
 pub fn get_conversations(app: AppHandle) -> Result<Vec<Conversation>, String> {
-    let path = match conversation_path(app, &"".to_string()) {
+    let path = match data_dir(app) {
         Some(path) => path,
         None => {
             return Err(format!("Could not resolve path for conversations"));

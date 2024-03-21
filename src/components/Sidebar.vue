@@ -1,9 +1,9 @@
 <template>
     <div class="min-w-280">
         <div
-            class="sidebar bg-shade-5 w-280 h-[100vh] flex flex-col justify-between overflow-y-auto fixed z-1"
+            class="bg-shade-5 w-280 h-[100vh] flex flex-col justify-between fixed z-1"
         >
-            <div>
+            <div class="overflow-y-auto scrollbar-hidden">
                 <SidebarItem
                     v-for="conversation in conversationsStore.conversations"
                     :conversation="conversation"
@@ -38,20 +38,13 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { useConversationsStore } from "../Lib/ConversationsStore";
-import { invoke } from "@tauri-apps/api";
-import { storeToRefs } from "pinia";
 import { createConversation } from "../Lib/helpers";
 import { useRoute, useRouter } from "vue-router";
 import SidebarItem from "./SidebarItem.vue";
 
 let conversationsStore = useConversationsStore();
-let { conversations } = storeToRefs(conversationsStore);
 let router = useRouter();
 let route = useRoute();
-
-function isCurrentConversation(id: string) {
-    return route.params.id === id;
-}
 
 onMounted(async () => {
     await conversationsStore.loadConversations();
@@ -59,7 +52,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.sidebar::-webkit-scrollbar {
+.scrollbar-hidden::-webkit-scrollbar {
     display: none;
 }
 </style>
